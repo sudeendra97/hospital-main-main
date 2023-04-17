@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hospital/models/patient.dart';
 import 'package:hospital/models/patient_data.dart';
@@ -88,6 +90,10 @@ class ApiCalls extends GetxController {
         var sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString(
             'Token', jsonEncode({'Key': responseData['key']}));
+      } else if (response.statusCode == 400) {
+        var responseData = jsonDecode(response.body);
+        Get.snackbar('', 'user name is already used');
+        EasyLoading.dismiss();
       }
 
       if (kDebugMode) {
@@ -118,6 +124,12 @@ class ApiCalls extends GetxController {
         var sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString(
             'Token', jsonEncode({'Key': responseData['key']}));
+      } else if (response.statusCode == 400) {
+        Get.snackbar('', 'Unable to log in with the provided credentials',
+            backgroundColor: Colors.blue);
+      } else {
+        Get.snackbar('', 'Unable to log Something went wrong',
+            backgroundColor: Colors.blue);
       }
 
       if (kDebugMode) {
@@ -206,6 +218,49 @@ class ApiCalls extends GetxController {
       }
 
       return response.statusCode;
+    } catch (e) {
+      // catchException(e);
+      // EasyLoading.dismiss();
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> getCurrentUsertDetails(String url) async {
+    var urlLink = Uri.parse(url);
+    try {
+      var headers = await getHeaders(_token);
+
+      http.Response response = await http.get(
+        urlLink,
+        headers: headers,
+      );
+
+      log(response.statusCode.toString());
+      log(response.body);
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        // List<Patient> temp = [];
+        // for (var data in responseData) {
+        //   temp.add(
+        //     Patient(
+        //       patientName: data['Patient_Name'],
+        //       id: data['id'],
+        //       visited: data['Visited'],
+        //     ),
+        //   );
+        // }
+
+        // patientList = temp;
+        return {'Status_Code': response.statusCode, 'Body': responseData};
+      }
+
+      if (kDebugMode) {
+        print(response.statusCode);
+        print(response.body);
+      }
+
+      return {'Status_Code': response.statusCode, 'Body': {}};
     } catch (e) {
       // catchException(e);
       // EasyLoading.dismiss();
@@ -316,6 +371,7 @@ class ApiCalls extends GetxController {
       request.fields['Complaint'] = data['Complaint'].toString();
       request.fields['Gender'] = data['Gender'].toString();
       request.fields['Instructions'] = data['Instructions'].toString();
+      request.fields['Client'] = data['Client'].toString();
 
       var res = await request.send();
       log(res.statusCode.toString());

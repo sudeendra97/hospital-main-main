@@ -6,4 +6,5 @@ class AppConstants {
   static const referalPatientList = '$url/reffarral/refferral-patient-list/';
   static const referalPatientdetails =
       '$url/reffarral/refferral-patient-details/';
+  static const getCurrentUser = '$url/reffarral/current-user/';
 }

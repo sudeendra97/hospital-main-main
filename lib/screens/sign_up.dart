@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:hospital/constants/app_constants.dart';
 import 'package:hospital/modular/modular_methods.dart';
 import 'package:hospital/providers/api_calls.dart';
+import 'package:hospital/screens/home_page.dart';
 import 'package:hospital/screens/log_in.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -82,7 +83,7 @@ class SignUpPage extends StatelessWidget {
                               if (value == 200 || value == 201) {
                                 EasyLoading.dismiss();
                                 Get.snackbar('', 'Successfully signed up');
-                                Get.offAndToNamed(LogInPage.routeName);
+                                Get.offAndToNamed(HomePage.routeName);
                               }
                             },
                           );

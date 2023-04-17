@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -20,13 +21,9 @@ class AddPatient extends StatefulWidget {
 
 class _AddPatientState extends State<AddPatient> {
   TextEditingController patientNameController = TextEditingController();
-
   TextEditingController ageController = TextEditingController();
-
   TextEditingController complaintController = TextEditingController();
-
   TextEditingController genderController = TextEditingController();
-
   TextEditingController instructionsController = TextEditingController();
 
   var file;
@@ -36,6 +33,18 @@ class _AddPatientState extends State<AddPatient> {
 
   String? fileType;
   final ApiCalls calls = Get.find();
+
+  var currentUser;
+
+  @override
+  void initState() {
+    calls.getCurrentUsertDetails(AppConstants.getCurrentUser).then((value) {
+      if (value['Status_Code'] == 200) {
+        currentUser = value['Body'];
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +125,7 @@ class _AddPatientState extends State<AddPatient> {
                       ),
                       onPressed: () {
                         EasyLoading.show();
+                        print(currentUser['id'].toString());
                         calls
                             .uploadFile(
                                 AppConstants.referalPatientList,
@@ -125,6 +135,7 @@ class _AddPatientState extends State<AddPatient> {
                                   'Complaint': complaintController.text,
                                   'Gender': genderController.text,
                                   'Instructions': instructionsController.text,
+                                  'Client': currentUser['id'] ?? '',
                                 },
                                 selectedFile,
                                 fileName,
@@ -134,8 +145,16 @@ class _AddPatientState extends State<AddPatient> {
                           if (value == 200 || value == 201) {
                             Get.back();
 
-                            Get.snackbar('', 'Successfully Added user');
+                            Get.snackbar(
+                              '',
+                              'Successfully Added user',
+                              backgroundColor: Colors.blue,
+                            );
                             // Get.offAndToNamed(HomePage.routeName);
+                          } else {
+                            Get.snackbar(
+                                '', 'Unable to Add user please try again',
+                                backgroundColor: Colors.blue);
                           }
                         });
                       },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hospital/constants/app_constants.dart';
 import 'package:hospital/providers/api_calls.dart';
@@ -57,10 +58,12 @@ class _HomePageState extends State<HomePage> {
                           return Card(
                             child: ListTile(
                               onTap: () {
+                                EasyLoading.show();
                                 controller
                                     .getPatientDetails(
                                         '${AppConstants.referalPatientdetails}${controller.patientList[index].id}')
                                     .then((value) {
+                                  EasyLoading.dismiss();
                                   if (value == 200) {
                                     Get.toNamed(PatientDetailsPage.routeName);
                                   }
@@ -107,8 +110,11 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(right: 15.0, bottom: 15),
           child: IconButton(
-              onPressed: () {
-                Get.toNamed(AddPatient.routeName);
+              onPressed: () async {
+                var data;
+                await Get.toNamed(AddPatient.routeName)!.then((value) {
+                  setState(() {});
+                });
               },
               icon: const Icon(
                 Icons.add_circle_outline,
